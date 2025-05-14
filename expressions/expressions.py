@@ -14,7 +14,8 @@ class Expression:
 
         # Binary infix operator case (for Add, Mul, etc.)
         left, right = self.operands
-        return f"{self._parenthesize(left)} {self.op_symbol} {self._parenthesize(right)}"
+        return f"{self._parenthesize(left)} {self.op_symbol} \
+              {self._parenthesize(right)}"
 
     def _parenthesize(self, operand):
         if not isinstance(operand, Expression):
@@ -24,14 +25,14 @@ class Expression:
         return str(operand)
 
     def __eq__(self, other):
-        return (
+        return (  # noqa: E721
             type(self) == type(other)
             and getattr(self, 'value', None) == getattr(other, 'value', None)
-            and getattr(self, 'operands', None) == getattr(other, 'operands', None)
+            and getattr(self, 'operands', None) == getattr(other, 'operands', None)  # noqa: E501
         )
 
     def __hash__(self):
-        return hash((type(self), getattr(self, 'value', None), tuple(getattr(self, 'operands', ()))))
+        return hash((type(self), getattr(self, 'value', None), tuple(getattr(self, 'operands', ()))))  # noqa: E501
 
     def __add__(self, other):
         return Add(self, self._coerce(other))
@@ -69,10 +70,12 @@ class Expression:
         else:
             return Number(value)
 
+
 # Terminal classes
 class Terminal(Expression):
     def __init__(self):
         super().__init__(operands=())
+
 
 class Number(Expression):
     def __init__(self, value):
@@ -105,6 +108,7 @@ class Operator(Expression):
             op if isinstance(op, Expression) else Number(op)
             for op in operands
         )
+
 
 # Concrete operator subclasses
 class Add(Expression):
@@ -150,6 +154,7 @@ class Pow(Expression):
 @singledispatch
 def differentiate(expr, *args, var=None, **kwargs):
     raise NotImplementedError(f"Cannot differentiate a {type(expr).__name__}")
+
 
 @differentiate.register(Symbol)
 def _(expr, *args, var=None, **kwargs):
